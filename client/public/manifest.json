@@ -1,0 +1,15 @@
+{
+  "name": "珍奶大亂鬥・單機試玩",
+  "short_name": "珍奶大亂鬥",
+  "description": "抽卡、合成飲料，與三名電腦對手展開即時混戰。",
+  "lang": "zh-Hant",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#100b17",
+  "theme_color": "#100b17",
+  "icons": [
+    { "src": "/app-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

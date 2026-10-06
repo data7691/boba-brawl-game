@@ -14,4 +14,3 @@
 - `drink-crafting-demo.html`：14 種原料選擇、開口杯倒茶／奶、配料落杯及封蓋成品概念預覽；`drink-crafting-demo-v1.html` 保留先前版本。
 
 對應圖像在 `client/public/assets/cards/concepts/`。這些預覽未連接正式帳號、庫存、抽卡機率、合成交易或多人戰鬥。原始版本仍保留在上一層 `C:\遊戲\previews` 與 `C:\遊戲\assets\card-previews`。
-

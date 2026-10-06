@@ -1,0 +1,9 @@
+node_modules/
+client/dist/
+client/tsconfig.tsbuildinfo
+server/data/*.json
+server/data/*.tmp
+server/data/*.log
+.env
+.env.*
+!.env.example

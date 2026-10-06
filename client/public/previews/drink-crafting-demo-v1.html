@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0d0b16">
+  <title>珍奶卡片・飲料合成預覽</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;color:#f8edda;background:#0d0b16}
+    *{box-sizing:border-box}body{margin:0;min-height:100dvh;background:radial-gradient(ellipse at 50% 30%,#34213e 0,#171124 54%,#0c0a13 100%);overflow-x:hidden}
+    button{font:inherit;touch-action:manipulation}button:focus-visible{outline:3px solid #fbd783;outline-offset:2px}
+    .app{max-width:1280px;min-height:100dvh;margin:auto;padding:max(10px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:9px}
+    header{display:flex;align-items:center;justify-content:space-between;min-height:36px;gap:10px}
+    h1{margin:0;color:#f6dca5;font-size:clamp(16px,2.2vw,23px);letter-spacing:.05em}
+    .subtle{color:#b9aabc;font-size:12px;white-space:nowrap}
+    main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.48fr) minmax(310px,1fr);gap:10px}
+    .panel{min-width:0;border:1px solid #aa805850;border-radius:15px;background:linear-gradient(145deg,#241a30df,#15111ede);box-shadow:inset 0 1px #ecd9aa14,0 8px 28px #03020940;overflow:hidden}
+    .ingredients{padding:10px 12px;display:flex;flex-direction:column;gap:5px}
+    .top-shelves{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .shelf{min-width:0}.shelf-head{display:flex;align-items:baseline;justify-content:space-between;gap:4px;min-height:20px}
+    h2{font-size:13px;font-weight:700;color:#eed4ab;margin:0;white-space:nowrap}
+    .rule{font-size:10px;color:#a798a6;white-space:nowrap}
+    .choice-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+    .topping-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px 6px;align-content:start}
+    .pick{min-width:0;min-height:69px;padding:4px 2px 3px;border-radius:9px;border:1px solid #70596b;background:linear-gradient(#2b2136,#211929);color:#eee2d5;display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:transform .14s,border-color .14s,box-shadow .14s}
+    .pick:hover{transform:translateY(-2px);border-color:#d4aa70}.pick:disabled{cursor:default;opacity:.65}
+    .pick[aria-pressed=true]{border-color:#ffdb8c;box-shadow:0 0 0 1px #f9c86e,0 0 14px #efa83f88;background:linear-gradient(#48323a,#2d2134)}
+    .pick-art{flex:0 0 auto;width:43px;height:57px;background-image:var(--art-url);background-size:var(--art-size);background-position:var(--art-x) var(--art-y);background-repeat:no-repeat;border-radius:5px;box-shadow:0 2px 8px #0008}
+    .pick-name{min-width:0;font-size:11px;font-weight:700;line-height:1.15;white-space:normal;word-break:keep-all;text-align:center}
+    .topping-grid .pick{flex-direction:column;gap:2px;min-height:72px;padding:3px 1px}.topping-grid .pick-art{width:39px;height:49px}.topping-grid .pick-name{font-size:10px}
+    .result{padding:10px 12px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:7px}
+    .recipe{display:flex;align-items:center;gap:5px;flex-wrap:wrap;min-height:30px}
+    .slot{font-size:11px;padding:4px 7px;border:1px solid #8d6c6b;border-radius:999px;background:#332633;color:#eddcc6;white-space:nowrap}
+    .slot.empty{color:#afa0ac;border-style:dashed}
+    .product{min-height:0;display:flex;align-items:center;justify-content:center;gap:10px;border-radius:12px;background:radial-gradient(ellipse at center,#403044a8 0,#21192b42 64%,transparent 100%)}
+    .cup-wrap{position:relative;width:155px;height:205px;flex:0 0 155px;filter:drop-shadow(0 9px 13px #0009)}
+    .straw{position:absolute;left:75px;top:1px;width:13px;height:75px;border-radius:5px;background:linear-gradient(90deg,#dfb782,#fff0ba 45%,#bd8f69);transform:rotate(12deg);z-index:1;border:1px solid #ad8062}
+    .lid{position:absolute;left:6px;top:48px;width:143px;height:26px;border-radius:50% 50% 20% 20%;background:linear-gradient(#fff8e9,#cdb79c);border:3px solid #c6a66e;box-shadow:inset 0 4px #ffffffa8;z-index:3}
+    .cup{position:absolute;left:14px;top:62px;width:127px;height:140px;clip-path:polygon(0 0,100% 0,86% 100%,14% 100%);background:linear-gradient(90deg,#fff8df7c 0%,var(--fluid,#a15e35) 18%,var(--fluid,#a15e35) 72%,#fff8df6b 100%);border-top:4px solid #e6cf9a;overflow:hidden;box-shadow:inset 10px 0 15px #ffffff44,inset -8px 0 20px #25152370}
+    .cup:after{content:"";position:absolute;left:18px;top:7px;width:13px;height:105px;border-radius:50%;background:linear-gradient(#fff8e9b5,transparent);transform:skew(-7deg)}
+    .cup-mark{position:absolute;top:33px;left:24px;color:#fff9dfa8;font-weight:900;font-size:14px;letter-spacing:.12em;text-shadow:0 1px 3px #2d1a2a6b;z-index:1}
+    .piece{position:absolute;z-index:1;left:var(--px);bottom:var(--py);width:var(--size);height:var(--size);transform:rotate(var(--rot));box-shadow:0 1px 3px #24111688}
+    .piece.pearl{border-radius:50%;background:radial-gradient(circle at 32% 28%,#b78261,#2e1919 68%)}
+    .piece.white-pearl{border-radius:50%;background:radial-gradient(circle at 32% 28%,#fff,#e8ded5 68%)}
+    .piece.boba{border-radius:50%;background:radial-gradient(circle at 32% 28%,#8c5541,#1b1113 70%)}
+    .piece.jelly{border-radius:3px;background:#201526d9;border:1px solid #74667d}
+    .piece.coconut{border-radius:3px;background:#ecfff4d9;border:1px solid #bde5df}
+    .piece.yellow-jelly{border-radius:3px;background:#f4ca4fd9;border:1px solid #ffe18c}
+    .piece.pudding{border-radius:4px;background:#ffd375;border:1px solid #e9ae45}
+    .piece.bean{border-radius:50%;background:#933f35;border:1px solid #c6796a}
+    .piece.mung{border-radius:50%;background:#799044;border:1px solid #a6b96a}
+    .piece.peanut{border-radius:48%;background:#d39a59;border:1px solid #f0c685}
+    .cup-wrap.mixing{animation:mix .78s ease-in-out}.cup-wrap.mixing .cup{animation:liquid .78s ease-in-out}
+    .product-copy{min-width:0;max-width:185px}.eyebrow{font-size:11px;color:#dbb67c;letter-spacing:.12em}
+    .product-name{margin:7px 0 9px;font-size:clamp(18px,2.3vw,26px);color:#fff1ca;line-height:1.17;overflow-wrap:anywhere}
+    .product-note{margin:0;font-size:12px;color:#c6b7c5;line-height:1.55}
+    .product-note strong{color:#f1d6a8;font-weight:600}
+    .result-made .cup-wrap{animation:result-pop .7s ease-out}
+    .result-actions{display:flex;align-items:center;gap:8px}
+    .craft{flex:1;min-height:42px;border:1px solid #f0cb85;border-radius:9px;background:linear-gradient(#b57a44,#8a512f);color:#fff7df;font-weight:800;letter-spacing:.12em;box-shadow:0 2px 0 #5b331f,0 0 16px #d89b5044;cursor:pointer}
+    .craft:disabled{opacity:.62;cursor:default}.message{min-height:17px;margin:0;font-size:11px;color:#d4c6cf;line-height:1.35}
+    .fly{position:fixed;z-index:30;pointer-events:none;border-radius:8px;box-shadow:0 0 18px #ffd7839c}
+    @keyframes mix{0%,100%{transform:rotate(0)}20%{transform:rotate(-7deg)}45%{transform:rotate(6deg)}70%{transform:rotate(-3deg)}}
+    @keyframes liquid{0%,100%{filter:brightness(1)}40%{filter:brightness(1.35)}}
+    @keyframes result-pop{0%{transform:scale(.7);filter:brightness(2)}45%{transform:scale(1.13);filter:brightness(1.4)}100%{transform:scale(1);filter:brightness(1)}}
+    @media(max-height:440px){.app{gap:5px}header{min-height:29px}.ingredients,.result{padding:7px 9px}.ingredients{gap:3px}.shelf-head{min-height:17px}.pick{min-height:60px}.pick-art{width:35px;height:48px}.topping-grid .pick{min-height:62px}.topping-grid .pick-art{width:32px;height:42px}.cup-wrap{transform:scale(.84);transform-origin:center;flex-basis:130px;width:130px;margin-right:-8px}.product-name{margin:4px 0 6px}.craft{min-height:36px}.subtle{display:none}}
+    @media(max-width:700px){main{grid-template-columns:1fr}.app{min-height:100dvh}.panel{min-height:290px}.result{min-height:300px}.subtle{display:none}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header><h1>珍奶卡片・飲料合成預覽</h1><span class="subtle">茶底 1 種＋乳品 0–1 種＋配料 0–2 種</span></header>
+    <main>
+      <section class="panel ingredients" aria-label="選擇原料">
+        <div class="top-shelves">
+          <div class="shelf"><div class="shelf-head"><h2>茶底</h2><span class="rule">必選 1</span></div><div id="tea" class="choice-row"></div></div>
+          <div class="shelf"><div class="shelf-head"><h2>乳品</h2><span class="rule">可不加</span></div><div id="dairy" class="choice-row"></div></div>
+        </div>
+        <div class="shelf-head"><h2>配料</h2><span class="rule">最多 2 種</span></div>
+        <div id="toppings" class="topping-grid"></div>
+      </section>
+      <section id="result" class="panel result" aria-label="合成結果預覽">
+        <div id="recipe" class="recipe"></div>
+        <div class="product">
+          <div id="cup-wrap" class="cup-wrap" aria-hidden="true">
+            <div class="straw"></div><div class="lid"></div>
+            <div id="cup" class="cup"><span class="cup-mark">BOBA</span><div id="pieces"></div></div>
+          </div>
+          <div class="product-copy" aria-live="polite">
+            <div class="eyebrow">製作結果</div>
+            <h2 id="product-name" class="product-name">尚未製作</h2>
+            <p id="product-note" class="product-note">選好原料後，按下<strong>製作飲料</strong>。</p>
+          </div>
+        </div>
+        <div><div class="result-actions"><button id="craft" class="craft" type="button">製作飲料</button></div><p id="message" class="message" aria-live="polite">這是配方預覽，製作時不扣除卡片。</p></div>
+      </section>
+    </main>
+  </div>
+  <script>
+    const ingredients=[
+      {id:'black-tea',name:'紅茶',group:'tea',sheet:1,spot:0},
+      {id:'green-tea',name:'綠茶',group:'tea',sheet:1,spot:1},
+      {id:'milk',name:'牛奶',group:'dairy',sheet:1,spot:2},
+      {id:'creamer',name:'奶精',group:'dairy',sheet:1,spot:3},
+      {id:'pearl',name:'珍珠',group:'toppings',sheet:1,spot:4,shape:'pearl'},
+      {id:'grass-jelly',name:'仙草',group:'toppings',sheet:1,spot:5,shape:'jelly'},
+      {id:'pudding',name:'布丁',group:'toppings',sheet:1,spot:6,shape:'pudding'},
+      {id:'red-bean',name:'紅豆',group:'toppings',sheet:1,spot:7,shape:'bean'},
+      {id:'coconut',name:'椰果',group:'toppings',sheet:1,spot:8,shape:'coconut'},
+      {id:'white-pearl',name:'白玉珍珠',group:'toppings',sheet:2,spot:0,shape:'white-pearl'},
+      {id:'boba',name:'波霸',group:'toppings',sheet:2,spot:1,shape:'boba'},
+      {id:'mung-bean',name:'綠豆',group:'toppings',sheet:2,spot:2,shape:'mung'},
+      {id:'yellow-jelly',name:'粉粿',group:'toppings',sheet:2,spot:3,shape:'yellow-jelly'},
+      {id:'peanut',name:'花生',group:'toppings',sheet:2,spot:4,shape:'peanut'}
+    ];
+    const byId=Object.fromEntries(ingredients.map(item=>[item.id,item]));
+    const state={tea:'black-tea',dairy:'milk',toppings:['pearl'],busy:false};
+    const recipeEl=document.getElementById('recipe'),cupEl=document.getElementById('cup'),piecesEl=document.getElementById('pieces');
+    const nameEl=document.getElementById('product-name'),noteEl=document.getElementById('product-note'),messageEl=document.getElementById('message');
+    const resultEl=document.getElementById('result'),cupWrap=document.getElementById('cup-wrap'),craftBtn=document.getElementById('craft');
+    const artStyle=item=>{
+      if(item.sheet===1)return `--art-url:url('../assets/cards/concepts/ingredients-base-01.png');--art-size:340% 340%;--art-x:${[5,50,95][item.spot%3]}%;--art-y:${[2,49,95][Math.floor(item.spot/3)]}%`;
+      const x=[2,50,98,18,82][item.spot],y=[3,3,3,100,100][item.spot];
+      return `--art-url:url('../assets/cards/concepts/ingredients-toppings-02.png');--art-size:310% 235%;--art-x:${x}%;--art-y:${y}%`;
+    };
+    for(const item of ingredients){
+      const button=document.createElement('button');
+      button.type='button';button.className='pick';button.dataset.id=item.id;button.setAttribute('aria-pressed','false');
+      button.innerHTML=`<span class="pick-art" style="${artStyle(item)}" aria-hidden="true"></span><span class="pick-name">${item.name}</span>`;
+      button.addEventListener('click',()=>select(item));
+      document.getElementById(item.group).append(button);
+    }
+    function select(item){
+      if(state.busy)return;
+      if(item.group==='tea')state.tea=item.id;
+      if(item.group==='dairy')state.dairy=state.dairy===item.id?null:item.id;
+      if(item.group==='toppings'){
+        if(state.toppings.includes(item.id))state.toppings=state.toppings.filter(id=>id!==item.id);
+        else if(state.toppings.length<2)state.toppings.push(item.id);
+        else{messageEl.textContent='一杯飲料最多選兩種配料；先取消一種再換。';return}
+      }
+      nameEl.textContent='尚未製作';noteEl.innerHTML='選好原料後，按下<strong>製作飲料</strong>。';
+      resultEl.classList.remove('result-made');messageEl.textContent='這是配方預覽，製作時不扣除卡片。';
+      render();
+    }
+    function recipeName(){
+      const tea=state.tea==='black-tea'?'紅茶':'綠茶';
+      const base=state.dairy==='milk'?(tea==='紅茶'?'鮮奶茶':'鮮奶綠'):state.dairy==='creamer'?(tea==='紅茶'?'奶茶':'奶綠'):tea;
+      return state.toppings.map(id=>byId[id].name).join('・')+base;
+    }
+    function render(){
+      document.querySelectorAll('.pick').forEach(button=>{
+        const item=byId[button.dataset.id],on=item.group==='tea'?state.tea===item.id:item.group==='dairy'?state.dairy===item.id:state.toppings.includes(item.id);
+        button.setAttribute('aria-pressed',String(on));button.disabled=state.busy;
+      });
+      const slots=[byId[state.tea].name,state.dairy?byId[state.dairy].name:'不加乳品',...state.toppings.map(id=>byId[id].name)];
+      recipeEl.innerHTML=slots.map((label,i)=>`<span class="slot ${i===1&&!state.dairy?'empty':''}">${label}</span>`).join('');
+      const colors={
+        'black-tea':{none:'#9c4b25',milk:'#bd8e67',creamer:'#b8764b'},
+        'green-tea':{none:'#72933d',milk:'#a0ae74',creamer:'#91a25a'}
+      };
+      cupEl.style.setProperty('--fluid',colors[state.tea][state.dairy||'none']);
+      piecesEl.replaceChildren();
+      state.toppings.forEach((id,group)=>{
+        const item=byId[id];
+        for(let i=0;i<6;i++){
+          const piece=document.createElement('span');piece.className=`piece ${item.shape}`;
+          piece.style.setProperty('--px',`${12+(i%3)*27+group*7}%`);
+          piece.style.setProperty('--py',`${7+Math.floor(i/3)*18+group*9}px`);
+          piece.style.setProperty('--size',`${item.shape==='boba'?18:item.shape==='pearl'||item.shape==='white-pearl'?11:13}px`);
+          piece.style.setProperty('--rot',`${(i*29+group*17)%70-35}deg`);
+          piecesEl.append(piece);
+        }
+      });
+    }
+    function flyToCup(button,delay){
+      const source=button.querySelector('.pick-art'),from=source.getBoundingClientRect(),to=cupWrap.getBoundingClientRect();
+      const ghost=source.cloneNode(true);ghost.classList.add('fly');ghost.style.left=`${from.left}px`;ghost.style.top=`${from.top}px`;ghost.style.width=`${from.width}px`;ghost.style.height=`${from.height}px`;document.body.append(ghost);
+      ghost.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:`translate(${to.left+to.width/2-from.left-from.width/2}px,${to.top+to.height/2-from.top-from.height/2}px) scale(.28)`,opacity:0}],{duration:640,delay,easing:'cubic-bezier(.21,.75,.24,1)',fill:'forwards'}).finished.then(()=>ghost.remove());
+    }
+    function craft(){
+      if(state.busy||!state.tea)return;
+      state.busy=true;render();craftBtn.disabled=true;resultEl.classList.remove('result-made');
+      nameEl.textContent='調製中…';noteEl.textContent='原料正在加入杯中。';messageEl.textContent='合成中';
+      const selected=[state.tea,state.dairy,...state.toppings].filter(Boolean);
+      if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+        selected.forEach((id,i)=>flyToCup(document.querySelector(`.pick[data-id="${id}"]`),i*110));
+        cupWrap.classList.remove('mixing');void cupWrap.offsetWidth;cupWrap.classList.add('mixing');
+      }
+      setTimeout(()=>{
+        state.busy=false;render();craftBtn.disabled=false;cupWrap.classList.remove('mixing');
+        nameEl.textContent=recipeName();
+        noteEl.innerHTML=`<strong>${byId[state.tea].name}</strong>茶底・${state.dairy?byId[state.dairy].name:'清茶'}・${state.toppings.length?state.toppings.map(id=>byId[id].name).join('＋'):'無配料'}`;
+        resultEl.classList.add('result-made');messageEl.textContent='製作完成！可以更換原料再試另一杯。';
+      },1150);
+    }
+    craftBtn.addEventListener('click',craft);
+    render();
+  </script>
+</body>
+</html>
